@@ -1,16 +1,16 @@
 class SecretMenuItemsController < ApplicationController
+    before_action :find_secret_menu_item, only: [:show, :update, :destroy]
+    
     def index
-        @secretMenuItems = SecretMenuItem.all
-        render json: @SecretMenuItems
+        @secret_menu_item = SecretMenuItem.all
+        render json: @secret_menu_item
     end
 
     def show
-        @secretMenuItem = SecretMenuItem.find(params[:id])
-        render json: @secretMenuItem
+        render json: @secret_menu_item
     end
-    
+
     def create
-        
         @secret_menu_item = SecretMenuItem.new(
             secret_menu_item_params  
         )
@@ -18,39 +18,44 @@ class SecretMenuItemsController < ApplicationController
        if @secret_menu_item.valid?
             @secret_menu_item.save
             render json: @secret_menu_item
-           
        else 
         render json: {
-            status: 422,
+            status: :unprocessable_entity,
             error: "Invalid Body"
         }
-           
        end
-        
     end
     
     def update
-        @secretMenuItem = SecretMenuItem.find(params[:id])
-        @secretMenuItem.update(
-            menu_name: params[:menu_name],
-            restaurant_name: params[:restaurant_name],
-            menu_description: params[:menu_description]
-        )
-        render json: @secretMenuItem
+        #@secret_menu_item = SecretMenuItem.update(secret_menu_item_params)
+        #if @secret_menu_item.valid?
+         #   @secret_menu_item.save
+        #     render json: @secret_menu_item
+            
+        # else
+        #     render json: @secret_menu_item.errors, status: :unprocessable_entity
+        # end
+        if @secret_menu_item.update(secret_menu_item_params) 
+           render json: @secret_menu_item
+        else
+           render json: @secret_menu_item.errors, status: :unprocessable_entity
+
+        end
     end
 
     def destroy
-        @secretMenuItems = SecretMenuItem.all
-        @secretMenuItem = SecretMenuItem.find(params[:id])
-        @secretMenuItem.destroy
-        render json: @secretMenuItem
+        @secret_menu_item.destroy
+        render json: @secret_menu_item
     end
     
     private
+    
+   
+    def find_secret_menu_item
+        @secret_menu_item = SecretMenuItem.find(params[:id])
+    end 
 
     def secret_menu_item_params
       params.require(:secret_menu_item).permit(:menu_name, :restaurant_name, :menu_description)
     end
-
-
 end
